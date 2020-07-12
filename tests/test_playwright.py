@@ -1,6 +1,3 @@
-import pytest
-
-
 def test_simple(testdir):
     """Make sure that our plugin works."""
 
@@ -19,6 +16,5 @@ def test_simple(testdir):
 
     # run all tests with pytest
     result = testdir.runpytest()
-    print("really done")
     # check that all 4 tests passed
     result.assert_outcomes(passed=1)
