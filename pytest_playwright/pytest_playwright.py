@@ -34,6 +34,11 @@ def launch_arguments() -> Dict:
 
 
 @pytest.fixture(scope="session")
+def context_arguments() -> Dict:
+    return {}
+
+
+@pytest.fixture(scope="session")
 async def launch_browser(
     pytestconfig: Any, launch_arguments: Dict, browser_name: str
 ) -> Callable[..., Awaitable[Browser]]:
@@ -57,8 +62,10 @@ async def browser(
 
 
 @pytest.fixture
-async def context(browser: Browser) -> AsyncGenerator[BrowserContext, None]:
-    context = await browser.newContext()
+async def context(
+    browser: Browser, context_arguments: Dict
+) -> AsyncGenerator[BrowserContext, None]:
+    context = await browser.newContext(**context_arguments)
     yield context
     await context.close()
 
