@@ -30,7 +30,7 @@ def test_multiple_browsers(testdir: Any) -> None:
     """
     )
     result = testdir.runpytest(
-        "--browser", "firefox", "--browser", "firefox", "--browser", "webkit"
+        "--browser", "chromium", "--browser", "firefox", "--browser", "webkit"
     )
     result.assert_outcomes(passed=3)
 
@@ -125,3 +125,37 @@ def test_goto(testdir: Any) -> None:
     )
     result = testdir.runpytest("--base-url", "https://example.com")
     result.assert_outcomes(passed=1)
+
+
+def test_skip_browsers(testdir: Any) -> None:
+    testdir.makepyfile(
+        """
+        import pytest
+
+        @pytest.mark.asyncio
+        @pytest.mark.skip_browser("firefox")
+        async def test_base_url(page, browser_name):
+            assert browser_name in ["chromium", "webkit"]
+    """
+    )
+    result = testdir.runpytest(
+        "--browser", "chromium", "--browser", "firefox", "--browser", "webkit"
+    )
+    result.assert_outcomes(passed=2, skipped=1)
+
+
+def test_only_browser(testdir: Any) -> None:
+    testdir.makepyfile(
+        """
+        import pytest
+
+        @pytest.mark.asyncio
+        @pytest.mark.only_browser("firefox")
+        async def test_base_url(page, browser_name):
+            assert browser_name == "firefox"
+    """
+    )
+    result = testdir.runpytest(
+        "--browser", "chromium", "--browser", "firefox", "--browser", "webkit"
+    )
+    result.assert_outcomes(passed=1, skipped=2)

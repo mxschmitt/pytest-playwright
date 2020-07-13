@@ -52,11 +52,6 @@ def skip_browsers(request: Any, browser_name: str) -> None:
 
 
 @pytest.fixture(scope="session")
-def browser_name(pytestconfig: Any) -> str:
-    return pytestconfig.getoption("browser")
-
-
-@pytest.fixture(scope="session")
 def event_loop() -> Generator[AbstractEventLoop, None, None]:
     loop = asyncio.get_event_loop()
     yield loop
