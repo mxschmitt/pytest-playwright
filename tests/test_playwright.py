@@ -20,4 +20,4 @@ def test_simple(testdir: Any) -> None:
     # run all tests with pytest
     result = testdir.runpytest()
 
-    result.assert_outcomes(passed=3)
+    result.assert_outcomes(passed=1)

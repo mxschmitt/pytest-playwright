@@ -12,8 +12,43 @@ from playwright.browser import Browser
 
 def pytest_generate_tests(metafunc: Any) -> None:
     if "browser_name" in metafunc.fixturenames:
-        browsers = metafunc.config.option.browser or ["chromium", "firefox", "webkit"]
+        browsers = metafunc.config.option.browser or ["chromium"]
         metafunc.parametrize("browser_name", browsers, scope="session")
+
+
+def pytest_configure(config: Any) -> None:
+    config.addinivalue_line(
+        "markers", "skip_browser(name): mark test to be skipped a specific browser"
+    )
+    config.addinivalue_line(
+        "markers", "only_browser(name): mark test to run only on a specific browser"
+    )
+
+
+def _get_skiplist(request: Any, values: List[str], value_name: str) -> List[str]:
+    skipped_values: List[str] = []
+    # Allowlist
+    only_marker = request.node.get_closest_marker(f"only_{value_name}")
+    if only_marker:
+        skipped_values = values
+        skipped_values.remove(only_marker.args[0])
+
+    # Denylist
+    skip_marker = request.node.get_closest_marker(f"skip_{value_name}")
+    if skip_marker:
+        skipped_values.append(skip_marker.args[0])
+
+    return skipped_values
+
+
+@pytest.fixture(autouse=True)
+def skip_browsers(request: Any, browser_name: str) -> None:
+    skip_browsers_names = _get_skiplist(
+        request, ["chromium", "firefox", "webkit"], "browser"
+    )
+
+    if browser_name in skip_browsers_names:
+        pytest.skip("skipped for this browser: {}".format(browser_name))
 
 
 @pytest.fixture(scope="session")
