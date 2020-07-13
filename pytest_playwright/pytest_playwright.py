@@ -13,11 +13,18 @@ def event_loop():
 
 
 @pytest.fixture(scope="session")
-async def launch_browser(pytestconfig):
+def launch_arguments():
+    return {}
+
+
+@pytest.fixture(scope="session")
+async def launch_browser(pytestconfig, launch_arguments):
     browser_name = pytestconfig.getoption("browser")
 
     async def launch(**kwargs):
-        return await playwright.browser_types[browser_name].launch(**kwargs)
+        return await playwright.browser_types[browser_name].launch(
+            **launch_arguments, **kwargs
+        )
 
     return launch
 
