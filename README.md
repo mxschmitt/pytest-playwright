@@ -48,10 +48,10 @@ A fixture which is a boolean if a specific execution is made by the specified br
 
 ### `--browser`
 
-Per default, the tests run on all the browsers. You can pass multiple times the `--browser` flag to run it on different browsers or a single time to run it only on a specific browser.
+By default, the tests run on the Chromium browser. You can pass multiple times the `--browser` flag to run it on different browsers or a single time to run it only on a specific browser.
 
 Possible values: `chromium`, `firefox`, `webkit`
 
 ### `--headful`
 
-Per default, the tests run in headless mode. You can pass the `--headful` CLI flag to run the browser in headful mode.
+By default, the tests run in headless mode. You can pass the `--headful` CLI flag to run the browser in headful mode.

@@ -10,7 +10,6 @@ def test_default(testdir: Any) -> None:
         async def test_default(page):
             await page.setContent('<span id="foo">bar</span>')
             assert await page.querySelector("#foo")
-            print("done")
     """
     )
     result = testdir.runpytest()
@@ -26,7 +25,6 @@ def test_multiple_browsers(testdir: Any) -> None:
         async def test_multiple_browsers(page):
             await page.setContent('<span id="foo">bar</span>')
             assert await page.querySelector("#foo")
-            print("done")
     """
     )
     result = testdir.runpytest(
