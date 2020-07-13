@@ -18,7 +18,7 @@
 
 ### `browser_name` - session scope
 
-A string which contains the current browser name.
+A string that contains the current browser name.
 
 ### `browser` - session scope
 
@@ -34,11 +34,11 @@ A separate Playwright page instance for each new test.
 
 ### `launch_arguments` - session scope
 
-A fixture which you can define to overwrite the launch arguments. It should return a Dict.
+A fixture that you can define to overwrite the launch arguments. It should return a Dict.
 
 ### `context_arguments` - session scope
 
-A fixture which you can define to overwrite the context arguments. It should return a Dict.
+A fixture that you can define to overwrite the context arguments. It should return a Dict.
 
 ### `is_chromium`, `is_firefox`, `is_webkit` - session scope
 
@@ -55,3 +55,80 @@ Possible values: `chromium`, `firefox`, `webkit`
 ### `--headful`
 
 By default, the tests run in headless mode. You can pass the `--headful` CLI flag to run the browser in headful mode.
+
+## Examples
+
+### Performing basic tests
+
+All your tests need to be async. This can be done by using the [pytest-asyncio](https://github.com/pytest-dev/pytest-asyncio) plugin.
+
+```py
+import pytest
+
+@pytest.mark.asyncio
+async def test_is_chromium(page):
+    await page.goto("https://www.google.com")
+    await page.type("input[name=q]", "Playwright GitHub")
+    await page.click("input[type=submit]")
+    await page.waitForSelector("text=microsoft/Playwright")
+```
+
+### Skipping by browser type
+
+```py
+import pytest
+
+@pytest.mark.asyncio
+@pytest.mark.skip_browser("firefox")
+async def test_is_chromium(page):
+    await page.goto("https://www.google.com")
+    # ...
+```
+
+### Running only on a specific browser
+
+```py
+import pytest
+
+@pytest.mark.asyncio
+@pytest.mark.only_browser("chromium")
+async def test_is_chromium(page):
+    await page.goto("https://www.google.com")
+    # ...
+```
+
+### Handle base-url
+
+Start Pytest with the `base-url` argument. Example: `pytest --base-url http://localhost:8080`
+
+```py
+import pytest
+
+@pytest.mark.asyncio
+async def test_is_chromium(page):
+    await page.goto("/admin")
+    # -> Will result in http://localhost:8080/admin
+```
+
+## Best practices
+
+### Run all tests in the folder with [pytest-asyncio](https://github.com/pytest-dev/pytest-asyncio)
+
+Put this into the `conftest.py` of your browser test folder.
+
+```py
+import pytest
+
+# Will mark all the tests as async
+def pytest_collection_modifyitems(items):
+    for item in items:
+        item.add_marker(pytest.mark.asyncio)
+```
+
+Alternatively, you can enable it also per module by putting this into the top of your test file.
+
+```py
+import pytest
+
+pytestmark = pytest.mark.asyncio
+```
