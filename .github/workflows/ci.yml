@@ -18,5 +18,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r local-requirements.txt
         pip install -e .
+    - name: Lint
+      run: |
+        black --check .
+        mypy .
+        flake8 pytest_playwright tests
     - name: Test with pytest
       run: pytest
