@@ -35,6 +35,10 @@ A fixture which you can define to overwrite the launch arguments. It should retu
 
 A fixture which you can define to overwrite the context arguments. It should return a Dict.
 
+### `is_chromium`, `is_firefox`, `is_webkit` - session scope
+
+A fixture which is a boolean if a specific execution is made by the specified browser.
+
 ## CLI arguments
 
 ### `--browser`

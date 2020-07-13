@@ -90,6 +90,21 @@ async def page(context: BrowserContext, base_url: str) -> AsyncGenerator[Page, N
     await page.close()
 
 
+@pytest.fixture(scope="session")
+def is_webkit(browser_name: str) -> bool:
+    return browser_name == "webkit"
+
+
+@pytest.fixture(scope="session")
+def is_firefox(browser_name: str) -> bool:
+    return browser_name == "firefox"
+
+
+@pytest.fixture(scope="session")
+def is_chromium(browser_name: str) -> bool:
+    return browser_name == "chromium"
+
+
 def pytest_addoption(parser: Any) -> None:
     group = parser.getgroup("playwright", "Playwright")
     group.addoption(
