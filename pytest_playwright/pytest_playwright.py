@@ -29,9 +29,11 @@ async def launch_browser(
     browser_name = pytestconfig.getoption("browser")
 
     async def launch(**kwargs: Dict[Any, Any]) -> Browser:
-        return await playwright.browser_types[browser_name].launch(
-            **launch_arguments, **kwargs
-        )
+        headful_option = pytestconfig.getoption("--headful")
+        launch_options = {**launch_arguments, **kwargs}
+        if headful_option:
+            launch_options["headless"] = False
+        return await playwright.browser_types[browser_name].launch(**launch_options)
 
     return launch
 
@@ -66,4 +68,10 @@ def pytest_addoption(parser: Any) -> None:
         choices=["chromium", "firefox", "webkit"],
         default="chromium",
         help="Browser engine which should be used",
+    )
+    parser.addoption(
+        "--headful",
+        action="store_true",
+        default=False,
+        help="Run tests in headful mode.",
     )
