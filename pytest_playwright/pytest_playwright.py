@@ -1,5 +1,5 @@
 from asyncio.events import AbstractEventLoop
-from typing import Any, Callable, Awaitable, AsyncGenerator, Dict, Generator
+from typing import Any, Callable, Awaitable, AsyncGenerator, Dict, Generator, List
 import asyncio
 
 import pytest
@@ -54,9 +54,22 @@ async def context(browser: Browser) -> AsyncGenerator[BrowserContext, None]:
     await context.close()
 
 
+async def _handle_page_goto(
+    page: Page, args: List[Any], kwargs: Dict[str, Any], base_url: str
+) -> None:
+    url = args.pop()
+    if not (url.startswith("http://") or url.startswith("https://")):
+        url = base_url + url
+    return await page._goto(url, *args, **kwargs)
+
+
 @pytest.fixture
-async def page(context: BrowserContext) -> AsyncGenerator[Page, None]:
+async def page(context: BrowserContext, base_url: str) -> AsyncGenerator[Page, None]:
     page = await context.newPage()
+    page._goto = page.goto
+    page.goto = lambda *args, **kwargs: _handle_page_goto(
+        page, list(args), kwargs, base_url
+    )
     yield page
     await page.close()
 
