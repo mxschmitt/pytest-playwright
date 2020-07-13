@@ -10,6 +10,17 @@ from playwright.browser import BrowserContext
 from playwright.browser import Browser
 
 
+def pytest_generate_tests(metafunc: Any) -> None:
+    if "browser_name" in metafunc.fixturenames:
+        browsers = metafunc.config.option.browser or ["chromium", "firefox", "webkit"]
+        metafunc.parametrize("browser_name", browsers, scope="session")
+
+
+@pytest.fixture(scope="session")
+def browser_name(pytestconfig: Any) -> str:
+    return pytestconfig.getoption("browser")
+
+
 @pytest.fixture(scope="session")
 def event_loop() -> Generator[AbstractEventLoop, None, None]:
     loop = asyncio.get_event_loop()
@@ -24,10 +35,8 @@ def launch_arguments() -> Dict:
 
 @pytest.fixture(scope="session")
 async def launch_browser(
-    pytestconfig: Any, launch_arguments: Dict
+    pytestconfig: Any, launch_arguments: Dict, browser_name: str
 ) -> Callable[..., Awaitable[Browser]]:
-    browser_name = pytestconfig.getoption("browser")
-
     async def launch(**kwargs: Dict[Any, Any]) -> Browser:
         headful_option = pytestconfig.getoption("--headful")
         launch_options = {**launch_arguments, **kwargs}
@@ -78,8 +87,8 @@ def pytest_addoption(parser: Any) -> None:
     group = parser.getgroup("playwright", "Playwright")
     group.addoption(
         "--browser",
-        choices=["chromium", "firefox", "webkit"],
-        default="chromium",
+        action="append",
+        default=[],
         help="Browser engine which should be used",
     )
     parser.addoption(

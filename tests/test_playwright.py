@@ -1,4 +1,7 @@
-def test_simple(testdir):
+from typing import Any
+
+
+def test_simple(testdir: Any) -> None:
     """Make sure that our plugin works."""
 
     # create a temporary pytest test file
@@ -16,5 +19,5 @@ def test_simple(testdir):
 
     # run all tests with pytest
     result = testdir.runpytest()
-    # check that all 4 tests passed
-    result.assert_outcomes(passed=1)
+
+    result.assert_outcomes(passed=3)
