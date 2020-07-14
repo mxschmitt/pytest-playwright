@@ -5,7 +5,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/mxschmitt/pytest-playwright/badge.svg?branch=master)](https://coveralls.io/github/mxschmitt/pytest-playwright?branch=master)
 [![black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
 
-> A Pytest wrapper for Playwright to automate web browsers (Chromium, Firefox, WebKit).
+> A Pytest wrapper for [Playwright](https://github.com/microsoft/playwright-python) to automate web browsers (Chromium, Firefox, WebKit).
 
 ## Features
 
