@@ -14,6 +14,12 @@
 - Run them headful with the `--headful` argument to debug them easily
 - Using [base-url](https://github.com/pytest-dev/pytest-base-url) to only use the relative URL in your `Page.goto` calls
 
+## Installation
+
+```
+pip install pytest-playwright
+```
+
 ## Fixtures
 
 ### `browser_name` - session scope
