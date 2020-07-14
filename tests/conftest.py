@@ -10,7 +10,8 @@ if sys.platform == "darwin":
     playwright_browser_path = os.path.expanduser("~/Library/Caches/ms-playwright")
 elif sys.platform == "linux":
     playwright_browser_path = os.path.expanduser("~/.cache/ms-playwright")
-else:
-    raise ValueError("Not supported!")
+elif sys.platform == "win32":
+    user_profile = os.environ["USERPROFILE"]
+    playwright_browser_path = f"{user_profile}\\AppData\\Local\\ms-playwright"
 
 os.environ["PLAYWRIGHT_BROWSERS_PATH"] = playwright_browser_path

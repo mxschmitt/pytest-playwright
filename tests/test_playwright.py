@@ -7,7 +7,10 @@ def test_default(testdir: Any) -> None:
         import pytest
 
         @pytest.mark.asyncio
-        async def test_default(page):
+        async def test_default(page, browser_name):
+            assert browser_name == "chromium"
+            user_agent = await page.evaluate("window.navigator.userAgent")
+            assert "HeadlessChrome" in user_agent
             await page.setContent('<span id="foo">bar</span>')
             assert await page.querySelector("#foo")
     """
@@ -157,3 +160,18 @@ def test_only_browser(testdir: Any) -> None:
         "--browser", "chromium", "--browser", "firefox", "--browser", "webkit"
     )
     result.assert_outcomes(passed=1, skipped=2)
+
+
+def test_headful(testdir: Any) -> None:
+    testdir.makepyfile(
+        """
+        import pytest
+
+        @pytest.mark.asyncio
+        async def test_base_url(page, browser_name):
+            user_agent = await page.evaluate("window.navigator.userAgent")
+            assert "HeadlessChrome" not in user_agent
+    """
+    )
+    result = testdir.runpytest("--browser", "chromium", "--headful")
+    result.assert_outcomes(passed=1)
