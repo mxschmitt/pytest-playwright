@@ -6,13 +6,12 @@ def test_default(testdir: Any) -> None:
         """
         import pytest
 
-        @pytest.mark.asyncio
-        async def test_default(page, browser_name):
+        def test_default(page, browser_name):
             assert browser_name == "chromium"
-            user_agent = await page.evaluate("window.navigator.userAgent")
+            user_agent = page.evaluate("window.navigator.userAgent")
             assert "HeadlessChrome" in user_agent
-            await page.setContent('<span id="foo">bar</span>')
-            assert await page.querySelector("#foo")
+            page.setContent('<span id="foo">bar</span>')
+            assert page.querySelector("#foo")
     """
     )
     result = testdir.runpytest()
@@ -22,12 +21,9 @@ def test_default(testdir: Any) -> None:
 def test_multiple_browsers(testdir: Any) -> None:
     testdir.makepyfile(
         """
-        import pytest
-
-        @pytest.mark.asyncio
-        async def test_multiple_browsers(page):
-            await page.setContent('<span id="foo">bar</span>')
-            assert await page.querySelector("#foo")
+        def test_multiple_browsers(page):
+            page.setContent('<span id="foo">bar</span>')
+            assert page.querySelector("#foo")
     """
     )
     result = testdir.runpytest(
@@ -48,11 +44,8 @@ def test_context_arguments(testdir: Any) -> None:
     )
     testdir.makepyfile(
         """
-        import pytest
-
-        @pytest.mark.asyncio
-        async def test_context_arguments(page):
-            assert await page.evaluate("window.navigator.userAgent") == "foobar"
+        def test_context_arguments(page):
+            assert page.evaluate("window.navigator.userAgent") == "foobar"
     """
     )
     result = testdir.runpytest()
@@ -62,10 +55,7 @@ def test_context_arguments(testdir: Any) -> None:
 def test_chromium(testdir: Any) -> None:
     testdir.makepyfile(
         """
-        import pytest
-
-        @pytest.mark.asyncio
-        async def test_is_chromium(page, browser_name, is_chromium, is_firefox, is_webkit):
+        def test_is_chromium(page, browser_name, is_chromium, is_firefox, is_webkit):
             assert browser_name == "chromium"
             assert is_chromium
             assert is_firefox is False
@@ -79,10 +69,7 @@ def test_chromium(testdir: Any) -> None:
 def test_firefox(testdir: Any) -> None:
     testdir.makepyfile(
         """
-        import pytest
-
-        @pytest.mark.asyncio
-        async def test_is_firefox(page, browser_name, is_chromium, is_firefox, is_webkit):
+        def test_is_firefox(page, browser_name, is_chromium, is_firefox, is_webkit):
             assert browser_name == "firefox"
             assert is_chromium is False
             assert is_firefox
@@ -96,10 +83,7 @@ def test_firefox(testdir: Any) -> None:
 def test_webkit(testdir: Any) -> None:
     testdir.makepyfile(
         """
-        import pytest
-
-        @pytest.mark.asyncio
-        async def test_is_webkit(page, browser_name, is_chromium, is_firefox, is_webkit):
+        def test_is_webkit(page, browser_name, is_chromium, is_firefox, is_webkit):
             assert browser_name == "webkit"
             assert is_chromium is False
             assert is_firefox is False
@@ -113,14 +97,11 @@ def test_webkit(testdir: Any) -> None:
 def test_goto(testdir: Any) -> None:
     testdir.makepyfile(
         """
-        import pytest
-
-        @pytest.mark.asyncio
-        async def test_base_url(page, base_url):
+        def test_base_url(page, base_url):
             assert base_url == "https://example.com"
-            await page.goto("/foobar")
+            page.goto("/foobar")
             assert page.url == "https://example.com/foobar"
-            await page.goto("https://www.google.com")
+            page.goto("https://www.google.com")
             assert page.url == "https://www.google.com/"
     """
     )
@@ -133,9 +114,8 @@ def test_skip_browsers(testdir: Any) -> None:
         """
         import pytest
 
-        @pytest.mark.asyncio
         @pytest.mark.skip_browser("firefox")
-        async def test_base_url(page, browser_name):
+        def test_base_url(page, browser_name):
             assert browser_name in ["chromium", "webkit"]
     """
     )
@@ -150,9 +130,8 @@ def test_only_browser(testdir: Any) -> None:
         """
         import pytest
 
-        @pytest.mark.asyncio
         @pytest.mark.only_browser("firefox")
-        async def test_base_url(page, browser_name):
+        def test_base_url(page, browser_name):
             assert browser_name == "firefox"
     """
     )
@@ -165,11 +144,8 @@ def test_only_browser(testdir: Any) -> None:
 def test_headful(testdir: Any) -> None:
     testdir.makepyfile(
         """
-        import pytest
-
-        @pytest.mark.asyncio
-        async def test_base_url(page, browser_name):
-            user_agent = await page.evaluate("window.navigator.userAgent")
+        def test_base_url(page, browser_name):
+            user_agent = page.evaluate("window.navigator.userAgent")
             assert "HeadlessChrome" not in user_agent
     """
     )

@@ -13,12 +13,7 @@ setuptools.setup(
     url="https://github.com/mxschmitt/pytest-playwright",
     packages=["pytest_playwright"],
     include_package_data=True,
-    install_requires=[
-        "playwright==0.0.4",
-        "pytest",
-        "pytest-base-url",
-        "pytest-asyncio",
-    ],
+    install_requires=["playwright==0.0.4", "pytest", "pytest-base-url"],
     entry_points={"pytest11": ["playwright = pytest_playwright.pytest_playwright"]},
     classifiers=[
         "Programming Language :: Python :: 3",

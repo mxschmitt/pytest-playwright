@@ -1,13 +1,11 @@
 from asyncio.events import AbstractEventLoop
-from typing import Any, Callable, Awaitable, AsyncGenerator, Dict, Generator, List
+from typing import Any, Callable, Dict, Generator, List
 import asyncio
 
 import pytest
 
-from playwright import async_playwright
-from playwright.page import Page
-from playwright.browser import BrowserContext
-from playwright.browser import Browser
+from playwright import sync_playwright
+from playwright.sync_api import Browser, BrowserContext, Page
 
 
 def pytest_generate_tests(metafunc: Any) -> None:
@@ -69,22 +67,22 @@ def context_arguments() -> Dict:
 
 
 @pytest.fixture(scope="session")
-async def launch_browser(
+def launch_browser(
     pytestconfig: Any, launch_arguments: Dict, browser_name: str
-) -> Callable[..., Awaitable[Browser]]:
-    async def launch(**kwargs: Dict[Any, Any]) -> Browser:
+) -> Callable[..., Browser]:
+    def launch(**kwargs: Dict[Any, Any]) -> Browser:
         headful_option = pytestconfig.getoption("--headful")
         launch_options = {**launch_arguments, **kwargs}
         if headful_option:
             launch_options["headless"] = False
-        pw_context = async_playwright()
-        pw = await pw_context.__aenter__()
-        browser = await getattr(pw, browser_name).launch(**launch_options)
+        pw_context = sync_playwright()
+        pw = pw_context.__enter__()
+        browser = getattr(pw, browser_name).launch(**launch_options)
         browser._close = browser.close
 
-        async def _handle_close() -> None:
-            await browser._close()
-            await pw_context.__aexit__(None, None, None)
+        def _handle_close() -> None:
+            browser._close()
+            pw_context.__exit__(None, None, None)
 
         browser.close = _handle_close
         return browser
@@ -93,41 +91,39 @@ async def launch_browser(
 
 
 @pytest.fixture(scope="session")
-async def browser(
-    launch_browser: Callable[[], Awaitable[Browser]]
-) -> AsyncGenerator[Browser, None]:
-    browser = await launch_browser()
+def browser(launch_browser: Callable[[], Browser]) -> Generator[Browser, None, None]:
+    browser = launch_browser()
     yield browser
-    await browser.close()
+    browser.close()
 
 
 @pytest.fixture
-async def context(
+def context(
     browser: Browser, context_arguments: Dict
-) -> AsyncGenerator[BrowserContext, None]:
-    context = await browser.newContext(**context_arguments)
+) -> Generator[BrowserContext, None, None]:
+    context = browser.newContext(**context_arguments)
     yield context
-    await context.close()
+    context.close()
 
 
-async def _handle_page_goto(
+def _handle_page_goto(
     page: Page, args: List[Any], kwargs: Dict[str, Any], base_url: str
 ) -> None:
     url = args.pop()
     if not (url.startswith("http://") or url.startswith("https://")):
         url = base_url + url
-    return await page._goto(url, *args, **kwargs)
+    return page._goto(url, *args, **kwargs)
 
 
 @pytest.fixture
-async def page(context: BrowserContext, base_url: str) -> AsyncGenerator[Page, None]:
-    page = await context.newPage()
+def page(context: BrowserContext, base_url: str) -> Generator[Page, None, None]:
+    page = context.newPage()
     page._goto = page.goto
     page.goto = lambda *args, **kwargs: _handle_page_goto(
         page, list(args), kwargs, base_url
     )
     yield page
-    await page.close()
+    page.close()
 
 
 @pytest.fixture(scope="session")
