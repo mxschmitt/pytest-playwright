@@ -26,6 +26,7 @@ jobs:
         pip install coveralls
         pip install -r local-requirements.txt
         pip install -e .
+        python -m playwright install
     - name: Lint
       run: |
         black --check .

@@ -4,7 +4,7 @@ import asyncio
 
 import pytest
 
-import playwright
+from playwright import async_playwright
 from playwright.page import Page
 from playwright.browser import BrowserContext
 from playwright.browser import Browser
@@ -77,7 +77,17 @@ async def launch_browser(
         launch_options = {**launch_arguments, **kwargs}
         if headful_option:
             launch_options["headless"] = False
-        return await playwright.browser_types[browser_name].launch(**launch_options)
+        pw_context = async_playwright()
+        pw = await pw_context.__aenter__()
+        browser = await getattr(pw, browser_name).launch(**launch_options)
+        browser._close = browser.close
+
+        async def _handle_close() -> None:
+            await browser._close()
+            await pw_context.__aexit__(None, None, None)
+
+        browser.close = _handle_close
+        return browser
 
     return launch
 
