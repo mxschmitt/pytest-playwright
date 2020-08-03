@@ -1,4 +1,4 @@
-# Pytest Playwright Plugin
+# Pytest Playwright Plugin (moved over to [microsoft/pytest-playwright](https://github.com/microsoft/playwright-pytest#readme))
 
 ![CI](https://github.com/mxschmitt/pytest-playwright/workflows/CI/badge.svg)
 [![PyPI](https://img.shields.io/pypi/v/pytest-playwright)](https://pypi.org/project/pytest-playwright/)
